@@ -22,7 +22,7 @@ touch_y = None
 pointer_x = None
 pointer_y = None
 
-@app.route('/discovery')
+@app.route('/3mice_discovery')
 def discovery():
     try:
         hostname = socket.gethostname()
