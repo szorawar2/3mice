@@ -1,18 +1,21 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
+# from engineio.async_drivers import gevent
+# import gevent
+# import eventlet
 
 from volume_control import *
 from youtube_control import open_youtube, play_pause_video
 from surfshark_control import open_surfshark, connect_surfshark, disconnect_surfshark
 from openvpn_control import start_openvpn, stop_openvpn
-import threading
+import threading 
 import pyautogui
 import socket
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 # Mobile app
 touch_x = None
@@ -151,7 +154,8 @@ def control_surfshark():
 
 
 def run_api():
-    socketio.run(app, host="0.0.0.0", port=5125, debug=False)
-    # app.run(host="0.0.0.0", port=5000, debug=False)
-    # app.run(port=5000, debug=False)
-
+    print("Starting Flask server...")
+    try:
+        socketio.run(app, host="0.0.0.0", port=5125, debug=False, use_reloader=False)
+    except Exception as e:
+        print(f"Error running server: {e}")
