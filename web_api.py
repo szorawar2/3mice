@@ -1,17 +1,16 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-# from engineio.async_drivers import gevent
-# import gevent
-# import eventlet
+import pythoncom
+import threading 
+import pyautogui
+import socket
 
 from volume_control import *
 from youtube_control import open_youtube, play_pause_video
 from surfshark_control import open_surfshark, connect_surfshark, disconnect_surfshark
 from openvpn_control import start_openvpn, stop_openvpn
-import threading 
-import pyautogui
-import socket
+
 
 app = Flask(__name__)
 CORS(app)
@@ -100,7 +99,7 @@ def set_volume():
 
     action = request.json.get("action")
 
-    import pythoncom
+    
     pythoncom.CoInitialize()
 
     try:
