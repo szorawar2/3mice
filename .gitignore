@@ -1,4 +1,5 @@
 __pycache__
 .venv
-dist
-build
+env
+windowed
+v1.0
