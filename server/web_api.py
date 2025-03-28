@@ -41,12 +41,10 @@ def serve_react(path):
     return send_from_directory(app.template_folder, 'index.html')
 
 
-
 """
   - Log Handling
   
 """
-
 # Configure logging to use PyQt signals
 def configure_logging(emitter):
     class QtLogHandler(logging.Handler):
@@ -73,12 +71,10 @@ def configure_logging(emitter):
 main_log = app.logger.info
 
 
-
 """
   - Mouse Actions
 
 """
-
 # Mobile screen
 touch_x = None
 touch_y = None
@@ -137,12 +133,10 @@ def mouse_click():
         return jsonify({f"error clicking {click}": str(e)}), 500
 
 
-
 """
  -  Send Text 
 
 """
-
 @app.route("/api/send_text", methods=["POST"])
 def send_text():
     try:
@@ -168,7 +162,6 @@ def send_text():
  -  Volume Control
 
 """
-
 @app.route("/api/volume", methods=["POST"])
 def set_volume():
 

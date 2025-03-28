@@ -1,4 +1,4 @@
 ## Build file
 pyInstaller --onefile --windowed --console --distpath ./windowed --icon ./mouse_icon.ico  main.py
 
-New/preferred - pyinstaller anymice.spec --noconfirm --distpath ./v1.1
+New/preferred - pyinstaller anymice.spec --noconfirm --distpath ../vX.X

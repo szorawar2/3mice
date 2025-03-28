@@ -14,6 +14,7 @@ class AnymiceLogger(QWidget):
         super().__init__()
         self.emitter = emitter
         self.setup_ui()
+        
         # Connect signal to log display
         self.emitter.log_signal.connect(self.append_log)
 
