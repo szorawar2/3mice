@@ -12,33 +12,19 @@ import logging
 from volume_control import *
 
 def resource_path(relative_path):
+    
+    # Production run - TEMP directory
     if getattr(sys, 'frozen', False):
-        base_path = sys._MEIPASS
+        base_path = sys._MEIPASS   
+    # Development run - current directory
     else:
         base_path = os.path.abspath(".")
-    print(f"base path: {base_path}")
+        
     return os.path.join(base_path, relative_path)
 
-app = Flask(
-    __name__,
-    static_folder=resource_path('react/static'),
-    template_folder=resource_path('react')
-)
+app = Flask( __name__, static_folder=resource_path('react'))
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
-
-
-"""
-  - Serve React files
-  
-"""
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_react(path):
-    if path and (app.static_folder and 
-                 (Path(app.static_folder) / path).exists()):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.template_folder, 'index.html')
 
 
 """
@@ -70,6 +56,22 @@ def configure_logging(emitter):
 # Logs on both pyqt app and terminal for debugging    
 main_log = app.logger.info
 
+
+"""
+  - Serve React files
+  
+"""
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    
+    # Serve assets
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    # Serve entry file
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+    
 
 """
   - Mouse Actions

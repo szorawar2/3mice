@@ -43,8 +43,8 @@ Control your computer's mouse remotely using your smartphone!
 
 ### Prerequisites
 
-- Python 3.8+
-- Node.js 16+
+- Python 3.10+
+- Node.js 18+
 - Windows OS
 
 ### Backend (Python)
@@ -85,7 +85,7 @@ cp -r frontend/build server/react
 ### Package with PyInstaller:
 
 ```bash
-pyinstaller 3mice.spec --noconfirm --distpath ../vX.X
+pyinstaller 3mice.spec --noconfirm --clean --distpath ../dev
 ```
 
 ## Troubleshooting 💑
@@ -95,15 +95,6 @@ pyinstaller 3mice.spec --noconfirm --distpath ../vX.X
 - Ensure both devices are on the same network
 - Verify Windows Firewall allows private network access
 - Check if port 5125 is open
-
-### App Not Starting
-
-- Install Microsoft Visual C++ Redistributable
-- Ensure `pythoncom38.dll` and `pywintypes38.dll` are present
-
-## License 📛
-
-MIT License - See LICENSE
 
 ## Important Note 🔐
 
