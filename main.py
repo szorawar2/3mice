@@ -18,7 +18,7 @@ def check_logs(item):
     window.show()
 
 def get_resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller"""
+    #Get absolute path to resource, works for dev and for PyInstaller
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -61,8 +61,6 @@ if __name__ == "__main__":
         window.hide()   # Hide the window instead
 
     window.closeEvent = closeEvent
-    
-    window.show()
     
     # Start System Tray Icon
     create_tray_icon()

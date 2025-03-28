@@ -5,12 +5,9 @@ from flask import Flask, request, jsonify, Response, send_from_directory, render
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import pythoncom
-import threading 
 import pyautogui
-import socket
 import engineio.async_drivers.threading
 import logging
-from gevent.pywsgi import WSGIServer
 
 from volume_control import *
 
