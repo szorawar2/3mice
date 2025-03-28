@@ -1,18 +1,7 @@
-"""
-
-                                                  _
-  __                   ___                       ( )
- |""|  ___    _   __  |"'"|  __                   `
- |""| |"'"|  |"| |""| |"'"| |""|        _._ _
- |""| |"'"|  |"| |""| |"'"| |""|       (__((_(
- |""| |"'"|  |"| |""| |"'"| |""|      \'-:--:-.
- "'''"''"'""'"'"''"''''"'"'""'""'~~~~~~'-----'~~~~  
- 
- Welcome lol
-
-"""
-
-from flask import Flask, request, jsonify, Response
+import sys
+import os
+from pathlib import Path 
+from flask import Flask, request, jsonify, Response, send_from_directory, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import pythoncom
@@ -21,17 +10,42 @@ import pyautogui
 import socket
 import engineio.async_drivers.threading
 import logging
+from gevent.pywsgi import WSGIServer
 
 from volume_control import *
 
-app = Flask(__name__)
+def resource_path(relative_path):
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    print(f"base path: {base_path}")
+    return os.path.join(base_path, relative_path)
+
+app = Flask(
+    __name__,
+    static_folder=resource_path('react/static'),
+    template_folder=resource_path('react')
+)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
+
 """
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.
+  - Serve React files
   
+"""
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    if path and (app.static_folder and 
+                 (Path(app.static_folder) / path).exists()):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.template_folder, 'index.html')
+
+
+
+"""
   - Log Handling
   
 """
@@ -64,9 +78,6 @@ main_log = app.logger.info
 
 
 """
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.
-
   - Mouse Actions
 
 """
@@ -110,7 +121,7 @@ def mouse_start(data):
         emit ("response",{"error": str(e)}), 500
         
 
-@app.route("/mouse_click", methods=["POST"])
+@app.route("/api/mouse_click", methods=["POST"])
 def mouse_click():
     data = request.json
     click = data.get("action")
@@ -127,28 +138,15 @@ def mouse_click():
     except Exception as e:
         main_log(f"{click} click failed to execute, error: {e}")
         return jsonify({f"error clicking {click}": str(e)}), 500
-"""
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.
-"""
 
-"""
- |\__/,|   (`\
- |_ _  |.--.) )
- ( T   )     /
-(((^_(((/(((_/
-"""
 
 
 """
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.
-
  -  Send Text 
 
 """
 
-@app.route("/send_text", methods=["POST"])
+@app.route("/api/send_text", methods=["POST"])
 def send_text():
     try:
         data = request.json
@@ -170,14 +168,11 @@ def send_text():
     
     
 """
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._
-_.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.-._.
-
  -  Volume Control
 
 """
 
-@app.route("/volume", methods=["POST"])
+@app.route("/api/volume", methods=["POST"])
 def set_volume():
 
     action = request.json.get("action")
@@ -201,21 +196,11 @@ def set_volume():
 
 def run_api(emitter):
     configure_logging(emitter)
-    print("Starting Flask server...")
     try:
-        socketio.run(app, host="0.0.0.0", port=5125, debug=False, use_reloader=False)
-    except Exception as e:
-        print(f"Error running server: {e}")
+        socketio.run(app, host="0.0.0.0", port=5125, debug=False, use_reloader=False, allow_unsafe_werkzeug=True) 
+        #allow_unsafe_werkzeug for production server
         
-"""
-         __
- _(\    |@@|
-(__/\__ \--/ __
-   \___|----|  |   __
-       \ }{ /\ )_ / _\
-       /\__/\ \__O (__
-      (--/\--)    \__/
-      _)(  )(_
-     `---''---`
+        main_log("Successfully started Flask server...")
+    except Exception as e:
+        main_log(f"Error running server: {e}")
 
-"""
